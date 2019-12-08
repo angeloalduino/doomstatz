@@ -14,8 +14,14 @@ doomstatz is a .NET application that hosts a [webview](https://github.com/webvie
 
 Since the UI is based on a web browser, it can be infinitely configured by editing the html file in [`html/statsview.html`](./html/statsview.html). The javascript function `handleStats()` is called with a JSON string containing the various memory values that are polled. If the process is not running, `handleWaiting()` is called.
 
+# Resources
+
+Seems to be pretty light on resources, only using a fraction of a percent of CPU time and 16MB of ram in testing on my 7700K machine.
+
 # Ideas
 
 The biggest necessity is to support all other common data types instead of just ints.
+
+It would be cool to have maybe a color/pulse effect on the kill count depending on rate. Also a progress bar for kills?
 
 It'd also be nice if the javascript could define/register the process name and the memory offsets and call into the native code, but the javascript callback API in the webview library is not working in my testing, so there's no way to receive messages from the js world right now.
