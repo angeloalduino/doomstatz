@@ -1,6 +1,8 @@
 # doomstatz
 
-doomstatz is a .NET application that hosts a [webview](https://github.com/webview-cs/webview-cs) that can be configured to display realtime memory values in a running process. It was originally written to be used with [prboom-plus](https://sourceforge.net/projects/prboom-plus/) and the included config/html are set up for that game specifically. However, it can be used to read int32 values from memory offsets of any application.
+doomstatz is a .NET application that hosts a [web view](https://github.com/webview-cs/webview-cs) that can be configured to display continuously updated memory values in a running process. An example use case would be using the web view as an [OBS](https://obsproject.com/) overlay to display game information that is unavailable in the standard game UI.
+
+It was originally written to be used with [prboom-plus](https://sourceforge.net/projects/prboom-plus/) and the included config/html are set up for that game specifically. However, it can be used to read int32 values from static memory offsets of any application.
 
 ## Installation
 
