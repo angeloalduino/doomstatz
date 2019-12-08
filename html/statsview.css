@@ -7,21 +7,23 @@ p,
 span,
 td {
   color: white;
+  font-weight: bold;
   font-family: monospace;
+}
+table {
+  width: 100%;
+  padding-right: 5px;
+  padding-bottom: 5px;
 }
 .vertical-center {
   margin: 0;
   position: absolute;
+  left: 0%;
   top: 50%;
   -ms-transform: translateY(-50%);
   transform: translateY(-50%);
-}
-.label {
-  font-weight: bold;
-}
-.separator {
-  color: lightgray;
+  width: 100%;
 }
 .stat {
-  font-size: larger;
+  font-size: 20px;
 }
