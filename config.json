@@ -1,0 +1,11 @@
+{
+  "processName": "prboom-plus",
+  "memoryAddresses": [
+    { "name": "game_tic_count", "offsetHex": "0x005db164" },
+    { "name": "total_tic_count", "offsetHex": "0x005db9cc" },
+    { "name": "killed_enemies", "offsetHex": "0x005820ac" },
+    { "name": "remaining_enemies", "offsetHex": "0x005db184" },
+    { "name": "secrets_found", "offsetHex": "0x005820b4" },
+    { "name": "total_secrets", "offsetHex": "0x005db390" }
+  ]
+}

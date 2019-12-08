@@ -1,45 +1,51 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Webview;
+using Newtonsoft.Json;
 
-namespace doom_memory_reader
+namespace doomstatz
 {
-    enum DoomAddress
+    class MemoryAddress
     {
-        GameTicCount = 0x005db164,
-        TotalTicCount = 0x005db9cc,
-        KilledEnemies = 0x005820ac,
-        RemainingEnemies = 0x005db184,
-        SecretsFound = 0x005820b4,
-        TotalSecrets = 0x005db390,
+        public string name { get; set; }
+        public string offsetHex { get; set; }
+
+        public int offset
+        {
+            get
+            {
+                return Convert.ToInt32(offsetHex, 16);
+            }
+        }
     }
 
-    static class JsonKeys
+    class ProcessConfig
     {
-        public const string GameTimeSeconds = "game_time_seconds";
-        public const string GameTimeFormatted = "game_time_formatted";
-        public const string KilledEnemies = "killed_enemies";
-        public const string RemainingEnemies = "remaining_enemies";
-        public const string TotalEnemies = "total_enemies";
-        public const string SecretsFound = "secrets_found";
-        public const string TotalSecrets = "total_secrets";
+        public string processName { get; set; }
+        public MemoryAddress[] memoryAddresses { get; set; }
     }
 
     class Program
     {
-        static Webview.Webview webview;
-        static MemoryReader memoryReader;
-        static int pollTime = 100;
+        private static Webview.Webview webview;
+        private static MemoryReader memoryReader;
+        private static ProcessConfig config;
+        private static int pollTime = 100;
 
+        // This is necessary for webview to work in .net core 3 apparently.
         [STAThread]
         static void Main(string[] args)
         {
+            var configPath = Environment.CurrentDirectory + "\\config.json";
+            config = JsonConvert.DeserializeObject<ProcessConfig>(File.ReadAllText(configPath));
             var path = Environment.CurrentDirectory + "\\html\\statsview.html";
             var pathUri = new Uri(path);
 
-            webview = new WebviewBuilder("Doom Stats", Content.FromUri(pathUri))
+            webview = new WebviewBuilder(config.processName + " stats", Content.FromUri(pathUri))
                 .WithSize(new Size(300, 180))
                 .Resizeable()
                 .Build();
@@ -47,7 +53,7 @@ namespace doom_memory_reader
             DateTime timeout = DateTime.Now + pollInterval;
 
             memoryReader = new MemoryReader();
-            memoryReader.Start("prboom-plus");
+            memoryReader.Start(config.processName);
 
             while (webview.Loop() == 0)
             {
@@ -56,26 +62,9 @@ namespace doom_memory_reader
                     timeout = DateTime.Now + pollInterval;
                     if (memoryReader.ProcessRunning)
                     {
-                        var gameSeconds = readAddress(DoomAddress.GameTicCount) / 35;
-                        var timeSpan = new TimeSpan(0, 0, gameSeconds);
-                        var timeFormat = gameSeconds >= 60 * 60 ? "h\\:mm\\:ss" : "mm\\:ss";
-                        var timeString = timeSpan.ToString(timeFormat);
-                        var killed = readAddress(DoomAddress.KilledEnemies);
-                        var remaining = readAddress(DoomAddress.RemainingEnemies);
-                        var totalEnemies = killed + remaining;
-                        var secretsFound = readAddress(DoomAddress.SecretsFound);
-                        var totalSecrets = readAddress(DoomAddress.TotalSecrets);
-
-                        var json = string.Format("{{\"{0}\":{1},\"{2}\":\"{3}\",\"{4}\":{5},\"{6}\":{7},\"{8}\":{9},\"{10}\":{11},\"{12}\":{13}}}",
-                        JsonKeys.GameTimeSeconds, gameSeconds,
-                        JsonKeys.GameTimeFormatted, timeString,
-                        JsonKeys.KilledEnemies, killed,
-                        JsonKeys.RemainingEnemies, remaining,
-                        JsonKeys.TotalEnemies, totalEnemies,
-                        JsonKeys.SecretsFound, secretsFound,
-                        JsonKeys.TotalSecrets, totalSecrets);
-
-                        webview.Eval("handleStats('" + json + "');");
+                        var stats = generateStats();
+                        var jsonString = JsonConvert.SerializeObject(stats);
+                        webview.Eval("handleStats('" + jsonString + "');");
                     }
                     else
                     {
@@ -88,9 +77,14 @@ namespace doom_memory_reader
             memoryReader.Stop();
         }
 
-        private static int readAddress(DoomAddress address)
+        private static Dictionary<string, int> generateStats()
         {
-            return memoryReader.ReadInt32((int)address);
+            Dictionary<string, int> stats = new Dictionary<string, int>();
+            foreach (var definition in config.memoryAddresses)
+            {
+                stats[definition.name] = memoryReader.ReadInt32(definition.offset);
+            }
+            return stats;
         }
     }
 }
