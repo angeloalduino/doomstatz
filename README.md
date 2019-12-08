@@ -12,7 +12,13 @@ doomstatz is a .NET application that hosts a [webview](https://github.com/webvie
 
 # Configuration
 
+### UI
+
 Since the UI is based on a web browser, it can be infinitely configured by editing the html file in [`html/statsview.html`](./html/statsview.html). The javascript function `handleStats()` is called with a JSON string containing the various memory values that are polled. If the process is not running, `handleWaiting()` is called.
+
+### Process
+
+An executable name can be defined in [`config.json`](./config.json) along with a list of memory offsets and string identifiers to use for them. doomstatz will continuously read int32 values from these addresses and pass them to the webview via the `handleStats()` call.
 
 # Resources
 
