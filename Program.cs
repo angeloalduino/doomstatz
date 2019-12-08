@@ -30,8 +30,8 @@ namespace doom_memory_reader
     class Program
     {
         static Webview.Webview webview;
-        static int pollTime = 100;
         static MemoryReader memoryReader;
+        static int pollTime = 100;
 
         [STAThread]
         static void Main(string[] args)
@@ -44,7 +44,7 @@ namespace doom_memory_reader
                 .Resizeable()
                 .Build();
             TimeSpan pollInterval = TimeSpan.FromMilliseconds(pollTime);
-            DateTime timeout = DateTime.Now;
+            DateTime timeout = DateTime.Now + pollInterval;
 
             memoryReader = new MemoryReader();
             memoryReader.Start("prboom-plus");
@@ -84,6 +84,8 @@ namespace doom_memory_reader
                 }
                 GC.Collect();
             }
+
+            memoryReader.Stop();
         }
 
         private static int readAddress(DoomAddress address)

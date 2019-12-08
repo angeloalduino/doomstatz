@@ -1,0 +1,27 @@
+body {
+  background-color: black;
+  overflow: hidden;
+  background-image: url('background.png');
+}
+p,
+span,
+td {
+  color: white;
+  font-family: monospace;
+}
+.vertical-center {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+.label {
+  font-weight: bold;
+}
+.separator {
+  color: lightgray;
+}
+.stat {
+  font-size: larger;
+}
